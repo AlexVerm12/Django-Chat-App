@@ -26,6 +26,10 @@
         align-items: flex-start;
         padding: 5px 0px;
     }
+
+    .color-red {
+        color: rgb(144, 20, 20);
+    }
 </style>
 
 <div class="demo-layout-waterfall mdl-layout mdl-js-layout">
@@ -33,7 +37,10 @@
         <!-- Top row, always visible -->
         <div class="mdl-layout__header-row">
             <!-- Title -->
-            <span class="mdl-layout-title">Welcome, {{ request.user.first_name}}!</span>
+            <span class="mdl-layout-title">
+                {% if request.user.is_authenticated %} Welcome, {{ request.user.first_name}}! {% else %} Welcome! Please
+                log in. {% endif %}
+            </span>
             <div class="mdl-layout-spacer"></div>
             <div
                 class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
@@ -68,7 +75,7 @@
     </div>
     <main class="mdl-layout__content">
         <div class="page-content">
-            {% for message in messages %}
+            {% if request.user.is_authenticated%} {% for message in messages %}
             <div class="message">
                 <small><span class="color-gray">{{ message.author.first_name}} {{ message.created_at}}</span></small>
                 {{message.text}}
@@ -83,6 +90,13 @@
                 </div>
                 <button class="mdl-button mdl-js-button mdl-button--accent">Send</button>
             </form>
+            {% else %}
+            <h1 class="color-red">Not logged in</h1>
+            <p>
+                You are actually not logged in. Please log in to see your chat.<br />
+                Click here to <a href="/login/">log in</a>.
+            </p>
+            {% endif %}
         </div>
     </main>
 </div>
