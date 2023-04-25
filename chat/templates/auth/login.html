@@ -1,12 +1,21 @@
+{% extends "base.html" %} {% block content %}
 <h1>Login</h1>
 
 <form method="POST" action="/login/">
     {% csrf_token %}
-    <div><input type="text" name="username" placeholder="Username" /></div>
-    <div><input type="password" name="password" placeholder="Password" /></div>
-    <div><button>Login</button></div>
+    <input type="hidden" name="redirect" value="{{redirect}}" />
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-textfield-login">
+        <input type="text" name="username" class="mdl-textfield__input" placeholder="Username..." />
+    </div>
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-textfield-login">
+        <input class="mdl-textfield__input" type="password" name="password" placeholder="Password" />
+    </div>
+    <div style="width: 100%; display: flex; align-items: center; justify-content: center">
+        <button class="mdl-button mdl-js-button mdl-button--accent">Login</button>
+    </div>
+    <p>You are actually not registered? Please register <a href="/registration/">here</a>.</p>
 </form>
 
 {% if wrongPassword%}
 <p>Username or password is wrong!</p>
-{% endif %}
+{% endif %} {% endblock %}
