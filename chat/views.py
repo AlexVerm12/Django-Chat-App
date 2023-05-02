@@ -44,5 +44,6 @@ def register(request):
 
 
 
-# def logout_view(request):
-#     logout(request)
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('/chat/')

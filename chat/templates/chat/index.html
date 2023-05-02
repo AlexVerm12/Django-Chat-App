@@ -1,13 +1,10 @@
 {% extends "base.html" %} {% block content %} {% if request.user.is_authenticated%}
-<div id="messageContainer">
-    {% for message in messages %}
-    <div class="message">
-        <small><span class="color-gray">{{ message.author.first_name}} {{ message.created_at}}</span></small>
-        {{message.text}}
-    </div>
-    {% endfor %}
-</div>
 <script>
+    const date = new Date();
+    const d = date.toString().split(" ");
+    const month = d[1];
+    const day = d[2];
+    const year = d[3];
     async function sendMessage() {
         let fd = new FormData();
         let token = "{{csrf_token}}";
@@ -15,11 +12,14 @@
         fd.append("csrfmiddlewaretoken", token);
         try {
             messageContainer.innerHTML += `
-            <div class="message" id="deleteMessage">
-                <small><span class="color-gray">{{request.user.first_name}}</span></small>
-                <i class="color-gray">${messagefield.value}</i>
+            <div id="deleteMessage"
+            class="message-wrapper {% if request.user.first_name == message.author.first_name %} start {%else%} end {%endif%}">
+            <div class="{% if request.user.first_name == message.author.first_name %} message-left {%else%} message-right {%endif%}">
+                <small><span class="color-gray">{{request.user.first_name}} ${month} ${day}, ${year}</span></small>
+                ${messagefield.value}
             </div>
-            `;
+        </div>
+        `;
 
             let response = await fetch("/chat/", {
                 method: "POST",
@@ -27,14 +27,16 @@
             });
             let json = await response.json();
             let obj = JSON.parse(json);
-            console.log(obj);
             deleteMessage.remove();
             messageContainer.innerHTML += `
-            <div class="message">
-                <small><span class="color-gray">{{request.user.first_name}} ${obj.fields.created_at}</span></small>
+        <div
+            class="message-wrapper start">
+            <div class="message-left">
+                <small><span class="color-gray">{{request.user.first_name}} ${month} ${day}, ${year}</span></small>
                 ${messagefield.value}
             </div>
-            `;
+        </div>
+        `;
             messagefield.value = "";
         } catch (e) {
             console.error("An error occured", e);
@@ -42,18 +44,33 @@
     }
 </script>
 
-<form onsubmit="sendMessage(); return false;" method="post">
-    {% csrf_token %}
-    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-        <input class="mdl-textfield__input" name="textmessage" type="text" id="messagefield" />
-        <label class="mdl-textfield__label" for="messagefield">Text...</label>
+<div class="wrapper">
+    <div class="messagecontainer" id="messageContainer">
+        {% for message in messages %}
+        <div
+            class="message-wrapper {% if request.user.first_name == message.author.first_name %} start {%else%} end {%endif%}">
+            <div
+                class="{% if request.user.first_name == message.author.first_name %} message-left {%else%} message-right {%endif%}">
+                <small><span class="color-gray">{{ message.author.first_name}} {{ message.created_at}}</span></small>
+                {{message.text}}
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    <button class="mdl-button mdl-js-button mdl-button--accent">Send</button>
-</form>
-{% else %}
-<h1 class="color-red">Not logged in</h1>
-<p>
-    You are actually not logged in. Please log in to see your chat.<br />
-    Click here to <a href="/login/">log in</a>.
-</p>
+
+    <form class="input-chat" onsubmit="sendMessage(); return false;" method="post">
+        {% csrf_token %}
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" name="textmessage" type="text" id="messagefield" />
+            <label class="mdl-textfield__label" for="messagefield">Text...</label>
+        </div>
+        <button class="mdl-button mdl-js-button mdl-button--accent">Send</button>
+    </form>
+    {% else %}
+    <h1 class="color-red">Not logged in</h1>
+    <p>
+        You are actually not logged in. Please log in to see your chat.<br />
+        Click here to <a href="/login/">log in</a>.
+    </p>
+</div>
 {% endif %} {% endblock %}
