@@ -20,7 +20,7 @@
                 <div class="mdl-layout__header-row">
                     <!-- Title -->
                     <span class="mdl-layout-title">
-                        {% if request.user.is_authenticated %} Welcome, {{ request.user.first_name}}! {% else %}
+                        {% if request.user.is_authenticated %} Welcome,{% if request.user.first_name %} {{ request.user.first_name}} {%else%} {{request.user.username}} {%endif%}! {% else %}
                         Welcome! Please log in. {% endif %}
                     </span>
                     <div class="mdl-layout-spacer"></div>
